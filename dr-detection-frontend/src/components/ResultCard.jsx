@@ -7,6 +7,7 @@ export default function ResultCard({ prediction, onFetchHeatmap, loadingHeatmap,
   if (!prediction) return null;
   const grade = DR_GRADES[prediction.grade ?? prediction.class ?? 0];
   const confidence = prediction.confidence ?? prediction.score ?? 0;
+  const classProbabilities = Object.entries(prediction.class_probabilities ?? {});
 
   return (
     <motion.div
@@ -60,6 +61,40 @@ export default function ResultCard({ prediction, onFetchHeatmap, loadingHeatmap,
           <p className="text-slate-300 text-xs font-mono">{formatTime(prediction.timestamp)}</p>
         </div>
       </div>
+
+      {classProbabilities.length > 0 && (
+        <div className="space-y-3">
+          <div className="text-slate-400 text-xs font-mono uppercase tracking-widest">
+            All Class Probabilities
+          </div>
+          <div className="space-y-2">
+            {classProbabilities.map(([key, entry]) => {
+              const classStyle = DR_GRADES[key] ?? DR_GRADES[0];
+              const percentage = entry.percentage ?? ((entry.probability ?? 0) * 100);
+
+              return (
+                <div key={key} className="bg-slate-900/60 rounded-xl p-3 border border-slate-800 space-y-2">
+                  <div className="flex items-center justify-between gap-3 text-sm">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className={`w-2.5 h-2.5 rounded-full ${classStyle.dot}`} />
+                      <span className="text-slate-200 truncate">{entry.label}</span>
+                    </div>
+                    <span className="font-mono text-white">{percentage.toFixed(2)}%</span>
+                  </div>
+                  <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                    <motion.div
+                      className={`h-full rounded-full ${classStyle.dot}`}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${percentage}%` }}
+                      transition={{ duration: 0.7, ease: "easeOut" }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Grad-CAM button */}
       <button

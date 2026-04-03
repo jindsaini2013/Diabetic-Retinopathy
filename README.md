@@ -7,23 +7,37 @@ A full-stack AI-powered web application for automated Diabetic Retinopathy gradi
 - FastAPI backend at the repository root
 - Vite + React frontend in `dr-detection-frontend`
 - PyTorch model weights in `best_dr_fixed_model.pth`
-- ONNX runtime model in `best_dr_fixed_model.onnx` for Vercel deployment
 
-## Vercel Deployment
+## Deployment Plan
 
-This repository is configured for a single Vercel project using two services:
+To keep the API fully working, including Grad-CAM, and avoid serverless cold-start and storage limits:
 
-- `web` serves the Vite frontend at `/`
-- `api` serves the FastAPI backend at `/api`
+- Deploy the frontend to Vercel
+- Deploy the FastAPI backend to Render as a web service
 
-The frontend already defaults to calling the backend through `/api`, so no Docker or Jenkins setup is needed.
-To fit Vercel's function storage limits, the deployed API uses ONNX Runtime instead of PyTorch.
+This avoids Docker and Jenkins while keeping the API continuously available as a normal Python service.
 
-### Deploy steps
+### Backend on Render
 
-1. Push this repository to GitHub.
-2. Import the repo into Vercel.
-3. In Project Settings, set the Framework Preset to `Services`.
+The repository includes [render.yaml](/Users/jindsaini/Desktop/Diabetic-Retinopathy/render.yaml) for the API service.
+
+1. Import this repo into Render.
+2. Create a `Web Service`.
+3. Use the root directory of the repository.
+4. Render will use:
+   `buildCommand: pip install -r requirements.txt`
+   `startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT`
+5. After deploy, note your backend URL, for example:
+   `https://diabetic-retinopathy-api.onrender.com`
+
+### Frontend on Vercel
+
+The frontend includes [dr-detection-frontend/vercel.json](/Users/jindsaini/Desktop/Diabetic-Retinopathy/dr-detection-frontend/vercel.json) for SPA routing.
+
+1. Import this same repo into Vercel.
+2. Set the project `Root Directory` to `dr-detection-frontend`.
+3. Add an environment variable:
+   `VITE_API_URL=https://your-render-backend-url.onrender.com`
 4. Deploy.
 
 ### Local development
@@ -43,11 +57,11 @@ npm install
 npm run dev
 ```
 
-If you run the frontend locally against the local backend, set `VITE_API_URL=http://localhost:8000`.
+If you run the frontend locally against the local backend, it already defaults to `http://localhost:8000`.
 
 ## Model
 
 - Architecture: EfficientDRNet with CBAM attention
 - Dataset: APTOS 2019 Blindness Detection
 - Classes: `0` No DR, `1` Mild DR, `2` Moderate DR, `3` Severe DR
-- Explainability: Grad-CAM remains a local-only workflow; the Vercel API serves predictions through ONNX Runtime
+- Explainability: Grad-CAM heatmap visualization

@@ -28,6 +28,9 @@ def test_predict_returns_grade():
     assert "grade" in data
     assert "label" in data
     assert "confidence" in data
+    assert "class_probabilities" in data
+    assert len(data["class_probabilities"]) == 4
+    assert sum(item["probability"] for item in data["class_probabilities"].values()) == pytest.approx(1.0, rel=1e-5)
     assert data["grade"] in (0, 1, 2, 3)
 
 
