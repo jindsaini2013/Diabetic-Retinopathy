@@ -2,6 +2,10 @@ import { motion } from "framer-motion";
 import { Eye, Activity } from "lucide-react";
 
 export default function Navbar({ health }) {
+  const isChecking = health === "checking";
+  const isOnline = health === "online";
+  const isWaking = health === "waking";
+
   return (
     <motion.nav
       initial={{ y: -20, opacity: 0 }}
@@ -31,19 +35,27 @@ export default function Navbar({ health }) {
           <span className="text-slate-400 font-mono text-xs">API</span>
           <span
             className={`w-2 h-2 rounded-full ${
-              health === null
+              isChecking
                 ? "bg-slate-500 animate-pulse"
-                : health
+                : isOnline
                 ? "bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]"
+                : isWaking
+                ? "bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.8)] animate-pulse"
                 : "bg-red-400 shadow-[0_0_6px_rgba(248,113,113,0.8)]"
             }`}
           />
           <span
             className={`text-xs font-mono font-medium ${
-              health === null ? "text-slate-500" : health ? "text-emerald-400" : "text-red-400"
+              isChecking
+                ? "text-slate-500"
+                : isOnline
+                ? "text-emerald-400"
+                : isWaking
+                ? "text-amber-400"
+                : "text-red-400"
             }`}
           >
-            {health === null ? "Checking…" : health ? "Online" : "Offline"}
+            {isChecking ? "Checking…" : isOnline ? "Online" : isWaking ? "Waking up…" : "Offline"}
           </span>
         </div>
       </div>

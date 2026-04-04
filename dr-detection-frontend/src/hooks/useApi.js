@@ -3,7 +3,7 @@ import axios from "axios";
 import { API_BASE_URL, MAX_HISTORY } from "../utils/constants";
 
 export function useApi() {
-  const [health, setHealth]           = useState(null); // null | true | false
+  const [health, setHealth]           = useState("checking");
   const [prediction, setPrediction]   = useState(null);
   const [heatmap, setHeatmap]         = useState(null);
   const [history, setHistory]         = useState([]);
@@ -14,10 +14,10 @@ export function useApi() {
   // Poll health every 15s
   const checkHealth = useCallback(async () => {
     try {
-      await axios.get(`${API_BASE_URL}/health`, { timeout: 4000 });
-      setHealth(true);
+      await axios.get(`${API_BASE_URL}/health`, { timeout: 30000 });
+      setHealth("online");
     } catch {
-      setHealth(false);
+      setHealth((current) => (current === "online" ? "waking" : "offline"));
     }
   }, []);
 
