@@ -6,7 +6,7 @@ colorTo: green
 sdk: docker
 app_port: 7860
 license: mit
-short_description: FastAPI backend for diabetic retinopathy prediction and Grad-CAM visualization
+short_description: FastAPI backend for DR prediction and Grad-CAM
 ---
 
 # Diabetic Retinopathy API
