@@ -24,7 +24,7 @@ export default function Navbar({ health }) {
               Retina<span className="text-gradient">AI</span>
             </span>
             <p className="text-[10px] text-slate-500 leading-none font-mono uppercase tracking-widest">
-              DR Detection System
+              DR Detection System Live
             </p>
           </div>
         </div>
