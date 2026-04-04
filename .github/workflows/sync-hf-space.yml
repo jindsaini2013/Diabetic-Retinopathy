@@ -23,6 +23,14 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Hugging Face Hub client
+        run: python -m pip install --upgrade "huggingface_hub>=0.32.0"
+
       - name: Assemble Space payload
         run: |
           mkdir -p space-build
@@ -47,17 +55,20 @@ jobs:
             exit 1
           fi
 
-      - name: Push to Hugging Face Space
+      - name: Upload Space files
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           HF_SPACE_ID: ${{ vars.HF_SPACE_ID }}
         run: |
-          cd space-build
-          git init
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -b main
-          git add .
-          git commit -m "Sync from GitHub" || true
-          git remote add origin "https://oauth2:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_ID}"
-          git push --force origin main
+          python - <<'PY'
+          import os
+          from huggingface_hub import HfApi
+
+          api = HfApi(token=os.environ["HF_TOKEN"])
+          api.upload_folder(
+              folder_path="space-build",
+              repo_id=os.environ["HF_SPACE_ID"],
+              repo_type="space",
+              commit_message="Sync from GitHub",
+          )
+          PY
