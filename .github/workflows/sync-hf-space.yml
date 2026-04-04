@@ -15,7 +15,6 @@ on:
 
 jobs:
   sync-space:
-    if: ${{ secrets.HF_TOKEN != '' && vars.HF_SPACE_ID != '' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -33,6 +32,20 @@ jobs:
           cp main.py space-build/main.py
           cp requirements.txt space-build/requirements.txt
           cp best_dr_fixed_model.pth space-build/best_dr_fixed_model.pth
+
+      - name: Validate required configuration
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_SPACE_ID: ${{ vars.HF_SPACE_ID }}
+        run: |
+          if [ -z "$HF_TOKEN" ]; then
+            echo "Missing GitHub Actions secret: HF_TOKEN"
+            exit 1
+          fi
+          if [ -z "$HF_SPACE_ID" ]; then
+            echo "Missing GitHub Actions variable: HF_SPACE_ID"
+            exit 1
+          fi
 
       - name: Push to Hugging Face Space
         env:
