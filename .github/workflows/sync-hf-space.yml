@@ -1,0 +1,50 @@
+name: Sync Backend to Hugging Face Space
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".python-version"
+      - ".github/workflows/sync-hf-space.yml"
+      - "deploy/hf-space/**"
+      - "best_dr_fixed_model.pth"
+      - "main.py"
+      - "requirements.txt"
+  workflow_dispatch:
+
+jobs:
+  sync-space:
+    if: ${{ secrets.HF_TOKEN != '' && vars.HF_SPACE_ID != '' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Assemble Space payload
+        run: |
+          mkdir -p space-build
+          cp deploy/hf-space/README.md space-build/README.md
+          cp deploy/hf-space/Dockerfile space-build/Dockerfile
+          cp .python-version space-build/.python-version
+          cp main.py space-build/main.py
+          cp requirements.txt space-build/requirements.txt
+          cp best_dr_fixed_model.pth space-build/best_dr_fixed_model.pth
+
+      - name: Push to Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_SPACE_ID: ${{ vars.HF_SPACE_ID }}
+        run: |
+          cd space-build
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b main
+          git add .
+          git commit -m "Sync from GitHub" || true
+          git remote add origin "https://oauth2:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_ID}"
+          git push --force origin main

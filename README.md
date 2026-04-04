@@ -13,22 +13,29 @@ A full-stack AI-powered web application for automated Diabetic Retinopathy gradi
 To keep the API fully working, including Grad-CAM, and avoid serverless cold-start and storage limits:
 
 - Deploy the frontend to Vercel
-- Deploy the FastAPI backend to Render as a web service
+- Deploy the FastAPI backend to a Hugging Face Docker Space
 
-This avoids Docker and Jenkins while keeping the API continuously available as a normal Python service.
+This keeps the frontend and backend separate. On free Hugging Face hardware, the backend can still sleep when idle.
 
-### Backend on Render
+### Backend on Hugging Face Spaces
 
-The repository includes [render.yaml](/Users/jindsaini/Desktop/Diabetic-Retinopathy/render.yaml) for the API service.
+The repository includes:
 
-1. Import this repo into Render.
-2. Create a `Web Service`.
-3. Use the root directory of the repository.
-4. Render will use:
-   `buildCommand: pip install -r requirements.txt`
-   `startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT`
-5. After deploy, note your backend URL, for example:
-   `https://diabetic-retinopathy-api.onrender.com`
+- [deploy/hf-space/README.md](/Users/jindsaini/Desktop/Diabetic-Retinopathy/deploy/hf-space/README.md)
+- [deploy/hf-space/Dockerfile](/Users/jindsaini/Desktop/Diabetic-Retinopathy/deploy/hf-space/Dockerfile)
+- [.github/workflows/sync-hf-space.yml](/Users/jindsaini/Desktop/Diabetic-Retinopathy/.github/workflows/sync-hf-space.yml)
+
+Setup:
+
+1. Create a new Hugging Face Space with SDK `Docker`.
+2. Add a GitHub secret named `HF_TOKEN`.
+3. Add a GitHub repository variable named `HF_SPACE_ID`.
+   Example: `your-hf-username/diabetic-retinopathy-api`
+4. Every push to `main` will sync the backend files to the Space automatically.
+
+After the Space builds, your backend URL will look like:
+
+`https://your-hf-space-subdomain.hf.space`
 
 ### Frontend on Vercel
 
@@ -37,7 +44,7 @@ The frontend includes [dr-detection-frontend/vercel.json](/Users/jindsaini/Deskt
 1. Import this same repo into Vercel.
 2. Set the project `Root Directory` to `dr-detection-frontend`.
 3. Add an environment variable:
-   `VITE_API_URL=https://your-render-backend-url.onrender.com`
+   `VITE_API_URL=https://your-hf-space-subdomain.hf.space`
 4. Deploy.
 
 ### Local development
