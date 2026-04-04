@@ -1,7 +1,4 @@
-export const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
-
-console.log("VITE_API_URL at build:", import.meta.env.VITE_API_URL);
-console.log("API_BASE_URL resolved:", API_BASE_URL);
+export const API_BASE_URL = "https://jindsaini20-diabetic-retinopathy-api.hf.space";
 
 
 export const DR_GRADES = {
