@@ -1,5 +1,9 @@
 export const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
+console.log("VITE_API_URL at build:", import.meta.env.VITE_API_URL);
+console.log("API_BASE_URL resolved:", API_BASE_URL);
+
+
 export const DR_GRADES = {
   0: { label: "No DR",          color: "text-emerald-400", bg: "bg-emerald-400/10", border: "border-emerald-400/30", dot: "bg-emerald-400" },
   1: { label: "Mild DR",        color: "text-yellow-400",  bg: "bg-yellow-400/10",  border: "border-yellow-400/30",  dot: "bg-yellow-400"  },
